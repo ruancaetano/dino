@@ -21,7 +21,7 @@ class Cloud(pygame.sprite.Sprite):
             )
         )
 
-    def update(self, pressed_keys):
+    def update(self):
         self.rect.move_ip(-VELOCITY, 0)
 
         if self.rect.x < -WIDTH/2:

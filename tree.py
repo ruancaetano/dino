@@ -35,7 +35,7 @@ class Tree(pygame.sprite.Sprite):
         self.dino_rects_map = dino_rects_map
         self.game_state = game_state
 
-    def update(self, pressed_keys):
+    def update(self):
         self.rect.move_ip(-WALK_WIDTH, 0)
 
         if self.rect.x < -WIDTH/2:

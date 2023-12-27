@@ -4,6 +4,7 @@ import pygame
 
 import configs
 import floor
+import controller
 
 from pygame.locals import (
     K_UP,
@@ -33,9 +34,10 @@ sprites_images = {
 
 class Dino(pygame.sprite.Sprite):
 
-    def __init__(self, dino_id: int,  game_state: state.GameState):
+    def __init__(self, dino_id: int, game_state: state.GameState, dino_controller: controller.Controller):
         super(Dino, self).__init__()
         self.id = dino_id
+        self.dino_controller = dino_controller
         self.using_accelerate_fall = False
         self.is_jumping = False
         self.is_downing = False
@@ -54,15 +56,15 @@ class Dino(pygame.sprite.Sprite):
             )
         )
 
-    def update(self, pressed_keys):
-
-        if pressed_keys[K_UP] and self.is_on_floor():
+    def update(self):
+        self.dino_controller.set_pressed_keys()
+        if self.dino_controller.pressed_keys[K_UP] and self.is_on_floor():
             self.is_jumping = True
             self.run_sprite_count = 1
             self.surf = sprites_images[SPRITE_RUN_PREFIX + str(self.run_sprite_count)]
             self.process_jump()
 
-        elif pressed_keys[K_DOWN] and self.is_downing:
+        elif self.dino_controller.pressed_keys[K_DOWN] and self.is_downing:
             self.is_jumping = False
             self.using_accelerate_fall = True
             self.process_fall()
