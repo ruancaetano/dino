@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 import dino
@@ -10,15 +12,15 @@ import state
 
 
 class Game:
-    def __init__(self):
-
+    def __init__(self, dinos_quantities: int):
         pygame.init()
-        self.clock = pygame.time.Clock()
 
+        self.clock = pygame.time.Clock()
         self.clock_tick = configs.CLOCK_TICK
+        self.dinos_quantities = dinos_quantities
         self.game_points = None
         self.event_manager = None
-        self.dino_sprite = None
+        self.dino_sprites = []
         self.game_state = None
         self.floor_sprite = None
 
@@ -31,9 +33,13 @@ class Game:
         self.game_state.all_sprites_group.add(self.floor_sprite)
         self.game_state.floor_rect = self.floor_sprite.rect
 
-        self.dino_sprite = dino.Dino(self.game_state)
-        self.game_state.all_sprites_group.add(self.dino_sprite)
-        self.game_state.dino_rect = self.dino_sprite.rect
+        for index in range(self.dinos_quantities):
+            dino_id = index+1
+            dino_sprite = dino.Dino(dino_id, self.game_state)
+            self.dino_sprites.append(dino_sprite)
+            self.game_state.all_sprites_group.add(dino_sprite)
+            self.game_state.dino_rects_map[dino_id] = dino_sprite.rect
+            self.game_state.points[dino_id] = 0
 
         self.game_points = point.Point(self.game_state)
 
@@ -60,14 +66,24 @@ class Game:
     pygame.quit()
 
     def verify_collisions(self):
-        if pygame.sprite.spritecollideany(self.dino_sprite, self.game_state.trees_sprites_group):
-            self.dino_sprite.kill()
+        sprites_to_delete = []
+
+        for index, sprite in enumerate(self.dino_sprites):
+            if pygame.sprite.spritecollideany(sprite, self.game_state.trees_sprites_group):
+                sprite.kill()
+                sprites_to_delete.append(index)
+
+        for to_delete_index in sorted(sprites_to_delete, reverse=True):
+            self.dino_sprites.pop(to_delete_index)
+            self.dinos_quantities -= 1
+
+        if len(self.dino_sprites) == 0:
             self.screen.fill(colors.RED_RGB)
             self.game_state.stop_game()
 
+
     def update_sprites(self):
         self.game_points.update()
-        self.screen.blit(self.game_points.img, self.game_points.rect)
         self.screen.blit(self.floor_sprite.surf, self.floor_sprite.rect)
 
         pressed_keys = pygame.key.get_pressed()

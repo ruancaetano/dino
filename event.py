@@ -26,7 +26,7 @@ class EventManager:
                 self.game_state.stop_game()
 
             if event.type == ADDTREE:
-                new_tree = tree.Tree(self.game_state.dino_rect, self.game_state)
+                new_tree = tree.Tree(self.game_state.dino_rects_map, self.game_state)
                 self.game_state.all_sprites_group.add(new_tree)
                 self.game_state.trees_sprites_group.add(new_tree)
 

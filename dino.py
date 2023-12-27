@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 import configs
@@ -31,21 +33,23 @@ sprites_images = {
 
 class Dino(pygame.sprite.Sprite):
 
-    def __init__(self, game_state: state.GameState):
+    def __init__(self, dino_id: int,  game_state: state.GameState):
         super(Dino, self).__init__()
+        self.id = dino_id
         self.using_accelerate_fall = False
         self.is_jumping = False
         self.is_downing = False
         self.jump_velocity = INITIAL_JUMP_VELOCITY
         self.sprite_name = SPRITE_RUN_PREFIX + "1"
         self.run_sprite_count = 1
+        self.points = 0
 
         self.game_state = game_state
 
         self.surf = sprites_images[self.sprite_name]
         self.rect: pygame.rect.Rect = self.surf.get_rect(
             center=(
-                WIDTH / 2 + HORIZONTAL_PADDING,
+                (WIDTH / 2 + HORIZONTAL_PADDING) - random.randint(0, HORIZONTAL_PADDING),
                 configs.SCREEN_HEIGHT - floor.HEIGHT - HEIGHT / 2
             )
         )

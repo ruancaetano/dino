@@ -23,7 +23,7 @@ class Tree(pygame.sprite.Sprite):
     dino_rect = None
     game_state = None
 
-    def __init__(self, dino_rect: pygame.rect.Rect, game_state: state.GameState):
+    def __init__(self, dino_rects_map, game_state: state.GameState):
         super(Tree, self).__init__()
         self.surf = sprites_images[SPRITE_NAME_PREFIX + "1"]
         self.rect = self.surf.get_rect(
@@ -32,7 +32,7 @@ class Tree(pygame.sprite.Sprite):
                 CENTER_Y_ON_FLOOR
             )
         )
-        self.dino_rect = dino_rect
+        self.dino_rects_map = dino_rects_map
         self.game_state = game_state
 
     def update(self, pressed_keys):
@@ -41,6 +41,8 @@ class Tree(pygame.sprite.Sprite):
         if self.rect.x < -WIDTH/2:
             self.kill()
 
-        if self.rect.x < self.dino_rect.x and not self.scored:
-            self.scored = True
-            self.game_state.add_point()
+        for dino_id, dino_rect in self.dino_rects_map.items():
+            if self.rect.x < dino_rect.x and not self.scored:
+                self.scored = True
+                self.game_state.add_point(dino_id)
+                break
