@@ -33,7 +33,7 @@ class Game:
         self.game_state.floor_rect = self.floor_sprite.rect
 
         for index in range(self.dinos_quantities):
-            dino_controller = controller.RandomController()
+            dino_controller = controller.KeyboardController()
 
             dino_id = index + 1
             dino_sprite = dino.Dino(dino_id, self.game_state, dino_controller)
