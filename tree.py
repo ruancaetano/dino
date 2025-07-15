@@ -6,7 +6,6 @@ import state
 
 WIDTH = 60
 HEIGHT = 52.5
-WALK_WIDTH = 10
 HORIZONTAL_PADDING = -50
 
 CENTER_Y_ON_FLOOR = configs.SCREEN_HEIGHT - floor.HEIGHT - HEIGHT / 2
@@ -19,7 +18,6 @@ sprites_images = {
 
 
 class Tree(pygame.sprite.Sprite):
-    scored = False
     dino_rect = None
     game_state = None
 
@@ -34,15 +32,19 @@ class Tree(pygame.sprite.Sprite):
         )
         self.dino_rects_map = dino_rects_map
         self.game_state = game_state
+        self.scored_dinos = set()  # Track which dinos have scored on this tree
 
     def update(self):
-        self.rect.move_ip(-WALK_WIDTH, 0)
+        # Continuous speed increase based on game time
+        # Speed increases every 30 points instead of every point
+        speed_level = max(0, (self.game_state.max_point - 1) // 30)  # Start level 1 at score 30
+        current_speed = configs.BASE_GAME_SPEED + (speed_level * configs.SPEED_INCREASE_RATE)
+        self.rect.move_ip(-current_speed, 0)
 
         if self.rect.x < -WIDTH/2:
             self.kill()
 
         for dino_id, dino_rect in self.dino_rects_map.items():
-            if self.rect.x < dino_rect.x and not self.scored:
-                self.scored = True
+            if self.rect.x < dino_rect.x and dino_id not in self.scored_dinos:
+                self.scored_dinos.add(dino_id)
                 self.game_state.add_point(dino_id)
-                break

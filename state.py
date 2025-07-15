@@ -29,6 +29,5 @@ class GameState:
         self.running = False
 
     def get_tick(self):
-        self.level = int(self.max_point / configs.NEW_LEVEL_POINT) + 1
-        return configs.CLOCK_TICK + (
-                (self.max_point / configs.NEW_LEVEL_POINT) * configs.CLOCK_INCREASING_BY_LEVEL)
+        # Constant frame rate, speed increases through obstacle movement
+        return configs.CLOCK_TICK
