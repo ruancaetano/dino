@@ -69,10 +69,10 @@ class Dino(pygame.sprite.Sprite):
         
         # Create a smaller collision box for better jumping
         self.collision_rect = pygame.Rect(
-            self.rect.x + DINO_WIDTH * 0.1,  # Even smaller collision box
-            self.rect.y + DINO_HEIGHT * 0.2,  # Start higher
-            DINO_WIDTH * 0.8,  # 80% of sprite width
-            DINO_HEIGHT * 0.6   # 60% of sprite height
+            int(self.rect.x + DINO_WIDTH * 0.1),  # Even smaller collision box
+            int(self.rect.y + DINO_HEIGHT * 0.2),  # Start higher
+            int(DINO_WIDTH * 0.8),  # 80% of sprite width
+            int(DINO_HEIGHT * 0.6)   # 60% of sprite height
         )
 
     def generate_random_color(self):
@@ -99,8 +99,8 @@ class Dino(pygame.sprite.Sprite):
 
     def update_collision_rect(self):
         """Update collision rect position to match current sprite position"""
-        self.collision_rect.x = self.rect.x + DINO_WIDTH * 0.1
-        self.collision_rect.y = self.rect.y + DINO_HEIGHT * 0.2
+        self.collision_rect.x = int(self.rect.x + DINO_WIDTH * 0.1)
+        self.collision_rect.y = int(self.rect.y + DINO_HEIGHT * 0.2)
 
     def update(self):
         self.dino_controller.set_pressed_keys()
@@ -113,10 +113,12 @@ class Dino(pygame.sprite.Sprite):
             self.surf = self.colored_sprites[SPRITE_RUN_PREFIX + str(self.run_sprite_count)]
             self.process_jump()
 
-        elif self.dino_controller.pressed_keys[K_DOWN] and self.is_downing:
+        elif self.dino_controller.pressed_keys[K_DOWN] and (self.is_jumping or self.is_downing):
             self.using_accelerate_fall = True
+        else:
+            self.using_accelerate_fall = False
 
-        elif self.is_jumping:
+        if self.is_jumping:
             self.process_jump()
 
         if self.is_downing:
@@ -146,7 +148,12 @@ class Dino(pygame.sprite.Sprite):
 
     def process_fall(self):
         # Simple gravity falling
-        self.fall_velocity += configs.GRAVITY
+        if self.using_accelerate_fall:
+            # Accelerate fall when down button is pressed
+            self.fall_velocity += configs.GRAVITY * 2
+        else:
+            # Normal gravity falling
+            self.fall_velocity += configs.GRAVITY
         
         self.rect.move_ip(0, self.fall_velocity)
         

@@ -20,7 +20,7 @@ class Neuron:
         if left_connections > 0:
             self.weights = np.random.uniform(-1, 1, left_connections)
         else:
-            self.weights = None
+            self.weights = np.array([])
 
     def set_output(self, output: float):
         self.output = output

@@ -25,12 +25,14 @@ class Game:
         self.controller_type = controller_type
         self.event_manager = None
         self.dino_sprites = []
-        self.game_state = None
+        self.game_state = state.GameState()
         self.floor_sprite = None
         self.font = pygame.font.Font(None, 36)
         self.fps_font = pygame.font.Font(None, 24)  # Smaller font for FPS
 
         self.screen = pygame.display.set_mode([configs.SCREEN_WIDTH, configs.SCREEN_HEIGHT])
+        
+
 
     def setup(self):
         self.game_state = state.GameState()
@@ -39,38 +41,41 @@ class Game:
         self.game_state.all_sprites_group.add(self.floor_sprite)
         self.game_state.floor_rect = self.floor_sprite.rect
 
+        # Use regular controllers
         for index in range(self.dinos_quantities):
-            dino_id = index + 1
-            
-            # Create controller based on type
-            if self.controller_type == 'keyboard':
-                dino_controller = controller.KeyboardController()
-            elif self.controller_type == 'random':
-                dino_controller = controller.RandomController()
-            elif self.controller_type == 'trained':
-                dino_controller = controller.TrainedController()
-            elif self.controller_type == 'train':
-                dino_controller = controller.NeuralNetworkController(dino_id, self.game_state)
-            else:
-                dino_controller = controller.KeyboardController()  # Default fallback
+                dino_id = index + 1
+                
+                # Create controller based on type
+                if self.controller_type == 'keyboard':
+                    dino_controller = controller.KeyboardController()
+                elif self.controller_type == 'random':
+                    dino_controller = controller.RandomController()
+                elif self.controller_type == 'auto':
+                    dino_controller = controller.NeuralNetworkController(dino_id, self.game_state)
+                else:
+                    dino_controller = controller.KeyboardController()  # Default fallback
 
-            dino_sprite = dino.Dino(dino_id, self.game_state, dino_controller)
-            self.dino_sprites.append(dino_sprite)
-            self.game_state.all_sprites_group.add(dino_sprite)
-            self.game_state.dino_rects_map[dino_id] = dino_sprite.rect
-            self.game_state.points[dino_id] = 0
+                dino_sprite = dino.Dino(dino_id, self.game_state, dino_controller)
+                self.dino_sprites.append(dino_sprite)
+                self.game_state.all_sprites_group.add(dino_sprite)
+                self.game_state.dino_rects_map[dino_id] = dino_sprite.rect
+                self.game_state.points[dino_id] = 0
 
         self.event_manager = event.EventManager(self.game_state)
 
         self.game_state.start_game()
 
     def start(self):
+        # Ensure setup is called before starting
+        if not self.event_manager:
+            self.setup()
+            
         while self.game_state.running:
             self.screen.fill(colors.BLUE_RGB)
 
-            self.event_manager.produce_events()
-
-            self.event_manager.handle_events()
+            if self.event_manager:
+                self.event_manager.produce_events()
+                self.event_manager.handle_events()
 
             self.update_sprites()
 
@@ -89,8 +94,8 @@ class Game:
         score_text = self.font.render(f"Score: {self.game_state.max_point}", True, (255, 255, 255))
         self.screen.blit(score_text, (10, 10))
         
-        # Draw current speed (increases every 30 points)
-        speed_level = max(0, (self.game_state.max_point - 1) // 30)  # Start level 1 at score 30
+        # Draw current speed (increases every 20 points)
+        speed_level = max(0, (self.game_state.max_point - 1) // 20)  # Start level 1 at score 20
         current_speed = configs.BASE_GAME_SPEED + (speed_level * configs.SPEED_INCREASE_RATE)
         speed_text = self.font.render(f"Speed: {current_speed:.1f} (Level: {speed_level})", True, (255, 255, 255))
         self.screen.blit(speed_text, (10, 50))
@@ -139,8 +144,6 @@ class Game:
             score_text = score_font.render(f"#{rank} Dino {dino_id}: {score}", True, (255, 255, 255))
             self.screen.blit(score_text, (start_x, y_pos))
 
-    pygame.quit()
-
     def verify_collisions(self):
         sprites_to_delete = []
 
@@ -160,32 +163,41 @@ class Game:
                 sprites_to_delete.append(index)
 
         for to_delete_index in sorted(sprites_to_delete, reverse=True):
+            # Remove dino from dino_rects_map when it dies
+            dino_id = self.dino_sprites[to_delete_index].id
+            if dino_id in self.game_state.dino_rects_map:
+                del self.game_state.dino_rects_map[dino_id]
+            
             self.dino_sprites.pop(to_delete_index)
             self.dinos_quantities -= 1
 
         if len(self.dino_sprites) == 0:
+            # Game over - stop the game
             self.screen.fill(colors.RED_RGB)
             self.game_state.stop_game()
 
     def update_sprites(self):
-        # Calculate current game speed for parallax (increases every 30 points)
-        speed_level = max(0, (self.game_state.max_point - 1) // 30)  # Start level 1 at score 30
+        # Calculate current game speed for parallax (increases every 20 points)
+        speed_level = max(0, (self.game_state.max_point - 1) // 20)  # Start level 1 at score 20
         current_speed = configs.BASE_GAME_SPEED + (speed_level * configs.SPEED_INCREASE_RATE)
 
         # Update floor with parallax scrolling
-        self.floor_sprite.update(current_speed)
-        # Render both floor segments for seamless tiling
-        self.screen.blit(self.floor_sprite.surf, self.floor_sprite.rect)
-        self.screen.blit(self.floor_sprite.surf2, self.floor_sprite.rect2)
+        if self.floor_sprite:
+            self.floor_sprite.update(int(current_speed))
+            # Render both floor segments for seamless tiling
+            self.screen.blit(self.floor_sprite.surf, self.floor_sprite.rect)
+            self.screen.blit(self.floor_sprite.surf2, self.floor_sprite.rect2)
 
         # Update and draw all sprites
         for entity in self.game_state.all_sprites_group:
             if hasattr(entity, 'update') and callable(getattr(entity, 'update')):
                 # Check if it's a cloud and needs special update
                 if isinstance(entity, cloud.Cloud):
-                    entity.update(current_speed)
+                    entity.update(int(current_speed))
                 else:
                     entity.update()
             self.screen.blit(entity.surf, entity.rect)
+
+
 
 

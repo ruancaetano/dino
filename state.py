@@ -3,14 +3,13 @@ import configs
 
 
 class GameState:
-    points = {}
-    max_point = 0
     running = False
     dino_rects_map = {}
-    floor_rect: pygame.rect.Rect = None
+    floor_rect: pygame.rect.Rect | None = None
 
     def __init__(self):
-        self.level = 1
+        self.points = {}
+        self.max_point = 0
         self.all_sprites_group = pygame.sprite.Group()
         self.trees_sprites_group = pygame.sprite.Group()
 
@@ -19,8 +18,7 @@ class GameState:
         if self.points[dino_id] > self.max_point:
             self.max_point = self.points[dino_id]
 
-    def add_floor_rect(self, position: pygame.rect.Rect):
-        self.floor_rect = position
+
 
     def start_game(self):
         self.running = True

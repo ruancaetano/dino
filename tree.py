@@ -18,10 +18,9 @@ sprites_images = {
 
 
 class Tree(pygame.sprite.Sprite):
-    dino_rect = None
     game_state = None
 
-    def __init__(self, dino_rects_map, game_state: state.GameState):
+    def __init__(self, game_state: state.GameState):
         super(Tree, self).__init__()
         self.surf = sprites_images[SPRITE_NAME_PREFIX + "1"]
         self.rect = self.surf.get_rect(
@@ -30,21 +29,21 @@ class Tree(pygame.sprite.Sprite):
                 CENTER_Y_ON_FLOOR
             )
         )
-        self.dino_rects_map = dino_rects_map
         self.game_state = game_state
         self.scored_dinos = set()  # Track which dinos have scored on this tree
 
     def update(self):
         # Continuous speed increase based on game time
-        # Speed increases every 30 points instead of every point
-        speed_level = max(0, (self.game_state.max_point - 1) // 30)  # Start level 1 at score 30
+        # Speed increases every 20 points instead of every point
+        speed_level = max(0, (self.game_state.max_point - 1) // 20)  # Start level 1 at score 20
         current_speed = configs.BASE_GAME_SPEED + (speed_level * configs.SPEED_INCREASE_RATE)
         self.rect.move_ip(-current_speed, 0)
 
         if self.rect.x < -WIDTH/2:
             self.kill()
 
-        for dino_id, dino_rect in self.dino_rects_map.items():
+        # Use the current live dino mapping, not the snapshot
+        for dino_id, dino_rect in self.game_state.dino_rects_map.items():
             if self.rect.x < dino_rect.x and dino_id not in self.scored_dinos:
                 self.scored_dinos.add(dino_id)
                 self.game_state.add_point(dino_id)

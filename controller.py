@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 import pygame
 
@@ -39,47 +40,7 @@ class RandomController(Controller):
             self.pressed_keys[key] = False
 
 
-class TrainedController(Controller):
-    pressed_keys = {K_UP: False, K_DOWN: False}
-    
-    def __init__(self):
-        super().__init__()
-        self.model_loaded = False
-        self.load_trained_model()
-    
-    def load_trained_model(self):
-        """Load the last trained model (placeholder for future implementation)"""
-        try:
-            # TODO: Implement model loading from saved file
-            # For now, this acts like a random controller
-            print("🤖 Trained model loaded (placeholder)")
-            self.model_loaded = True
-        except Exception as e:
-            print(f"⚠️ Could not load trained model: {e}")
-            print("🤖 Falling back to random controller")
-            self.model_loaded = False
-    
-    def set_pressed_keys(self):
-        """Use trained model to make decisions"""
-        if self.model_loaded:
-            # TODO: Implement actual model prediction
-            # For now, use improved random logic
-            import random
-            # More intelligent random behavior (jump more often when needed)
-            if random.random() < 0.7:  # 70% chance to jump
-                self.pressed_keys[K_UP] = True
-                self.pressed_keys[K_DOWN] = False
-            else:
-                self.pressed_keys[K_UP] = False
-                self.pressed_keys[K_DOWN] = random.random() < 0.3
-        else:
-            # Fallback to random controller
-            random_index = random.randint(0, 1)
-            for key, value in self.pressed_keys.items():
-                if key == [K_UP, K_DOWN][random_index]:
-                    self.pressed_keys[key] = True
-                else:
-                    self.pressed_keys[key] = False
+
 
 
 class NeuralNetworkController(Controller):
@@ -90,6 +51,9 @@ class NeuralNetworkController(Controller):
         self.dino_id = dino_id
         self.game_state = game_state
         self.rna = network.NeuralNetwork(3, 3, 5, 2)
+        
+        # Try to load the best genetic individual if available
+        self.load_best_genetic_weights()
 
     def set_pressed_keys(self):
         dino_x = self.game_state.dino_rects_map[self.dino_id].x
@@ -118,3 +82,22 @@ class NeuralNetworkController(Controller):
 
         self.pressed_keys[K_UP] = False
         self.pressed_keys[K_DOWN] = False
+
+
+    def load_best_genetic_weights(self, filename: str = "best_genetic_dino.npz"):
+        """Load the best genetic individual's weights"""
+        try:
+            data = np.load(filename)
+            num_weights = data['num_weights']
+            
+            # Reconstruct the weights list
+            weights = []
+            for i in range(num_weights):
+                weights.append(data[f'weight_{i}'])
+            
+            self.rna.load_weights(weights)
+            print(f"Loaded best genetic individual (Gen {data['generation']}, Fitness: {data['fitness']})")
+            return True
+        except Exception as e:
+            print(f"No genetic training file found, using random weights")
+            return False

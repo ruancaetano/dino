@@ -4,7 +4,7 @@ SCREEN_HEIGHT = 600
 GRAVITY = 0.6  
 INITIAL_JUMP_VELOCITY = 12
 BASE_GAME_SPEED = 6  # Base speed (pixels per frame)
-SPEED_INCREASE_RATE = 0.03  # Speed increases by 0.03 every 30 points (0.001 * 30)
+SPEED_INCREASE_RATE = 0.5  # Speed increases by 0.5 every 20 points
 
 CLOCK_TICK = 60
 
