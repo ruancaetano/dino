@@ -1,14 +1,7 @@
 import pygame
 import time
-import game
-import genetic_controller
-import state
-import floor
-import dino
-import event
-import colors
-import configs
-import cloud
+from game import game, state, floor, dino, event, colors, configs, cloud
+from controllers import genetic_controller
 
 class GeneticTrainer(game.Game):
     def __init__(self, population_size: int = 50):

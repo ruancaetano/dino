@@ -2,11 +2,7 @@ import random
 import time
 
 import pygame
-import tree
-
-import state
-import cloud
-import configs
+from game import tree, state, cloud, configs
 
 ADDTREE = pygame.USEREVENT + 1
 ADDCLOUD = pygame.USEREVENT + 2

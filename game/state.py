@@ -1,6 +1,5 @@
 import pygame
-import configs
-import floor
+from game import configs, floor
 
 # Constants to avoid circular imports
 DINO_HEIGHT = 70

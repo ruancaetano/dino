@@ -1,6 +1,5 @@
 import pygame
-
-import configs
+from game import configs
 
 HEIGHT = 130
 
@@ -32,10 +31,10 @@ class Floor(pygame.sprite.Sprite):
         self.scroll_x -= game_speed * self.scroll_speed
         
         # Update the first floor segment position
-        self.rect.x = self.scroll_x
+        self.rect.x = int(self.scroll_x)
         
         # Update the second floor segment position
-        self.rect2.x = self.scroll_x + configs.SCREEN_WIDTH
+        self.rect2.x = int(self.scroll_x + configs.SCREEN_WIDTH)
         
         # Reset positions when segments have moved completely off screen
         if self.scroll_x <= -configs.SCREEN_WIDTH:

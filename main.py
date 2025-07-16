@@ -1,6 +1,5 @@
 import sys
-import game
-import controller
+from game.game import Game
 
 def main():
     if len(sys.argv) < 2:
@@ -25,8 +24,8 @@ def main():
         print("Evolving neural networks through natural selection...")
         print("=" * 40)
         # Use the dedicated training module
-        import train
-        train.main()
+        from train.train import main as train_main
+        train_main()
         
     elif mode == 'auto':
         print("Starting Auto Mode")
@@ -44,7 +43,7 @@ def run_game(num_dinos, controller_type):
     try:
         print("Game started!")
         
-        game_obj = game.Game(num_dinos, controller_type)
+        game_obj = Game(num_dinos, controller_type)
         game_obj.setup()
         game_obj.start()
                 

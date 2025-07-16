@@ -2,12 +2,12 @@ import random
 import numpy as np
 import pygame
 from pygame.locals import K_UP, K_DOWN
-import network
-import state
-import configs
-import genetic_algorithm
+from controllers.controller import Controller
+from train import network
+from game import state
+from train import genetic_algorithm
 
-class GeneticController:
+class GeneticController(Controller):
     pressed_keys = {K_UP: False, K_DOWN: False}
 
     def __init__(self, dino_id: int, game_state: state.GameState, neural_network: network.NeuralNetwork):

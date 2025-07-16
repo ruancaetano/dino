@@ -3,16 +3,13 @@ import time
 
 import pygame
 
-import configs
-import floor
-import controller
+from game import configs, floor, state
+from controllers.controller import Controller
 
 from pygame.locals import (
     K_UP,
     K_DOWN,
 )
-
-import state
 
 DINO_WIDTH = 80
 DINO_HEIGHT = 70
@@ -36,7 +33,7 @@ original_sprites = {
 
 class Dino(pygame.sprite.Sprite):
 
-    def __init__(self, dino_id: int, game_state: state.GameState, dino_controller: controller.Controller):
+    def __init__(self, dino_id: int, game_state: state.GameState, dino_controller: Controller):
         super(Dino, self).__init__()
         self.id = dino_id
         self.dino_controller = dino_controller
@@ -136,6 +133,8 @@ class Dino(pygame.sprite.Sprite):
             self.surf = self.colored_sprites[SPRITE_RUN_PREFIX + str(self.run_sprite_count)]
 
     def is_on_floor(self):
+        if self.game_state.floor_rect is None:
+            return False
         return self.rect.bottom >= self.game_state.floor_rect.top
 
     def process_jump(self):
@@ -162,7 +161,7 @@ class Dino(pygame.sprite.Sprite):
         
         self.rect.move_ip(0, self.fall_velocity)
         
-        if self.is_on_floor():
+        if self.is_on_floor() and self.game_state.floor_rect is not None:
             self.rect.move_ip(0, -max(0, self.rect.bottom - self.game_state.floor_rect.top))
             self.is_jumping = False
             self.is_downing = False

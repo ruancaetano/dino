@@ -1,7 +1,6 @@
 import pygame
 import random
-
-import configs
+from game import configs
 
 WIDTH = 80
 HEIGHT = 42

@@ -2,7 +2,7 @@ import random
 import numpy as np
 import copy
 from typing import List, Tuple
-import network
+from train import network
 
 class GeneticAlgorithm:
     def __init__(self, population_size: int = 50, mutation_rate: float = 0.1, crossover_rate: float = 0.8):

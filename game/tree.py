@@ -1,8 +1,5 @@
 import pygame
-
-import configs
-import floor
-import state
+from game import configs, floor, state
 
 WIDTH = 60
 HEIGHT = 52.5
@@ -33,6 +30,9 @@ class Tree(pygame.sprite.Sprite):
         self.scored_dinos = set()  # Track which dinos have scored on this tree
 
     def update(self):
+        if self.game_state is None:
+            return
+            
         # Continuous speed increase based on game time
         # Speed increases every 20 points instead of every point
         speed_level = max(0, (self.game_state.max_point - 1) // 20)  # Start level 1 at score 20

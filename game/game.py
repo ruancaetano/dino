@@ -1,18 +1,11 @@
 import time
-
 import pygame
-
-import controller
-import dino
-import event
-import floor
-import colors
-import configs
-import state
-import cloud
+from controllers.keyboard_controller import KeyboardController
+from controllers.auto_controller import AutoController
+from game import dino, event, floor, colors, configs, state, cloud
 
 # Import constants for collision detection
-from dino import DINO_WIDTH, DINO_HEIGHT
+from game.dino import DINO_WIDTH, DINO_HEIGHT
 
 
 class Game:
@@ -47,13 +40,11 @@ class Game:
                 
                 # Create controller based on type
                 if self.controller_type == 'keyboard':
-                    dino_controller = controller.KeyboardController()
-                elif self.controller_type == 'random':
-                    dino_controller = controller.RandomController()
+                    dino_controller = KeyboardController()
                 elif self.controller_type == 'auto':
-                    dino_controller = controller.NeuralNetworkController(dino_id, self.game_state)
+                    dino_controller = AutoController(dino_id, self.game_state)
                 else:
-                    dino_controller = controller.KeyboardController()  # Default fallback
+                    dino_controller = KeyboardController()  # Default fallback
 
                 dino_sprite = dino.Dino(dino_id, self.game_state, dino_controller)
                 self.dino_sprites.append(dino_sprite)
