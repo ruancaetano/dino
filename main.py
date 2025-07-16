@@ -24,7 +24,7 @@ def main():
         print("🦖 5 Dinosaurs with Random Controller")
         print("📊 Collecting training data...")
         print("=" * 40)
-        run_game(5, 'random')
+        run_game(5, 'train')
         
     elif mode == 'auto':
         print("🎮 Starting Auto Mode")
