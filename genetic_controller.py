@@ -16,18 +16,7 @@ class GeneticController:
         self.rna = neural_network
 
     def set_pressed_keys(self):
-        dino_x = self.game_state.dino_rects_map[self.dino_id].x
-        trees = self.game_state.trees_sprites_group.sprites()
-
-        next_target_x = configs.SCREEN_WIDTH
-        has_tree_value = 0
-        for tree in trees:
-            if tree.rect.x > dino_x:
-                has_tree_value = 1
-                next_target_x = tree.rect.x
-                break
-
-        inputs = [has_tree_value, self.game_state.get_tick(), abs(next_target_x - dino_x)]
+        inputs = self.game_state.get_neural_network_inputs(self.dino_id)
         outputs = self.rna.calculate_output(inputs)
 
         if outputs[0] > 0:
@@ -46,7 +35,7 @@ class GeneticController:
 class GeneticGameManager:
     def __init__(self, population_size: int = 50):
         self.ga = genetic_algorithm.GeneticAlgorithm(population_size=population_size)
-        self.ga.initialize_population(3, 3, 5, 2)  # 3 inputs, 3 hidden layers, 5 nodes, 2 outputs
+        self.ga.initialize_population(6, 3, 5, 2)  # 6 inputs, 3 hidden layers, 5 nodes, 2 outputs
         self.current_generation = 0
         self.games_per_generation = 3  # Number of games to play before evolving
         
@@ -60,7 +49,7 @@ class GeneticGameManager:
                 controllers.append(controller)
             else:
                 # If we need more controllers than population size, use random ones
-                neural_network = network.NeuralNetwork(3, 3, 5, 2)
+                neural_network = network.NeuralNetwork(6, 3, 5, 2)
                 controller = GeneticController(i + 1, game_state, neural_network)
                 controllers.append(controller)
         return controllers

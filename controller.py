@@ -50,24 +50,13 @@ class NeuralNetworkController(Controller):
         super().__init__()
         self.dino_id = dino_id
         self.game_state = game_state
-        self.rna = network.NeuralNetwork(3, 3, 5, 2)
+        self.rna = network.NeuralNetwork(6, 3, 5, 2)
         
         # Try to load the best genetic individual if available
         self.load_best_genetic_weights()
 
     def set_pressed_keys(self):
-        dino_x = self.game_state.dino_rects_map[self.dino_id].x
-        trees = self.game_state.trees_sprites_group.sprites()
-
-        next_target_x = configs.SCREEN_WIDTH
-        has_tree_value = 0
-        for tree in trees:
-            if tree.rect.x > dino_x:
-                has_tree_value = 1
-                next_target_x = tree.rect.x
-                break
-
-        inputs = [has_tree_value, self.game_state.get_tick(), abs(next_target_x - dino_x)]
+        inputs = self.game_state.get_neural_network_inputs(self.dino_id)
         outputs = self.rna.calculate_output(inputs)
 
         if outputs[0] > 0:

@@ -113,7 +113,7 @@ class Dino(pygame.sprite.Sprite):
             self.surf = self.colored_sprites[SPRITE_RUN_PREFIX + str(self.run_sprite_count)]
             self.process_jump()
 
-        elif self.dino_controller.pressed_keys[K_DOWN] and (self.is_jumping or self.is_downing):
+        elif self.dino_controller.pressed_keys[K_DOWN]:
             self.using_accelerate_fall = True
         else:
             self.using_accelerate_fall = False
@@ -139,8 +139,13 @@ class Dino(pygame.sprite.Sprite):
         return self.rect.bottom >= self.game_state.floor_rect.top
 
     def process_jump(self):
+        # If DOWN is pressed during jump, accelerate the fall
+        if self.using_accelerate_fall:
+            self.jump_velocity -= configs.GRAVITY * 2  # Accelerate fall
+        else:
+            self.jump_velocity -= configs.GRAVITY
+            
         self.rect.move_ip(0, -self.jump_velocity)
-        self.jump_velocity -= configs.GRAVITY
         if self.jump_velocity <= 0:
             self.is_jumping = False
             self.is_downing = True

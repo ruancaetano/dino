@@ -15,16 +15,13 @@ class GeneticAlgorithm:
         self.best_individual = None
         
     def initialize_population(self, input_size: int, hidden_layers: int, hidden_nodes: int, output_size: int):
-        """Initialize a population of neural networks"""
         self.population = []
         
-        # Try to load the best individual from previous training
         best_individual = self.load_best_individual()
         
         for i in range(self.population_size):
             nn = network.NeuralNetwork(input_size, hidden_layers, hidden_nodes, output_size)
             
-            # If we have a best individual and this is the first one, use it as a starting point
             if i == 0 and best_individual is not None:
                 nn.load_weights(best_individual.get_weights())
                 print(f"Loaded best individual (Gen {self.generation}, Fitness: {self.best_fitness}) as starting point")
@@ -34,22 +31,18 @@ class GeneticAlgorithm:
         print(f"Initialized population of {self.population_size} neural networks")
     
     def load_best_individual(self, filename: str = "best_genetic_dino.npz"):
-        """Load the best individual from a saved file"""
         try:
             data = np.load(filename)
             num_weights = data['num_weights']
             
-            # Create a neural network with the same architecture
-            nn = network.NeuralNetwork(3, 3, 5, 2)  # Default architecture
+            nn = network.NeuralNetwork(6, 3, 5, 2) 
             
-            # Reconstruct the weights list
             weights = []
             for i in range(num_weights):
                 weights.append(data[f'weight_{i}'])
             
             nn.load_weights(weights)
             
-            # Update generation and fitness info
             self.generation = data['generation']
             self.best_fitness = data['fitness']
             self.best_individual = nn
@@ -62,9 +55,6 @@ class GeneticAlgorithm:
             return None
     
     def evaluate_fitness(self, individual: network.NeuralNetwork, game_results: List[Tuple[int, int]]) -> float:
-        """Calculate fitness based on game performance"""
-        # game_results is a list of (dino_id, score) tuples
-        # Find the score for this individual (dino_id corresponds to population index)
         for dino_id, score in game_results:
             if dino_id - 1 < len(self.population) and self.population[dino_id - 1] is individual:
                 return float(score)
@@ -72,7 +62,6 @@ class GeneticAlgorithm:
     
     def select_parents(self, fitness_scores: List[float]) -> Tuple[network.NeuralNetwork, network.NeuralNetwork]:
         """Select two parents using tournament selection"""
-        # Tournament selection
         tournament_size = 3
         
         def tournament_select():
@@ -87,7 +76,6 @@ class GeneticAlgorithm:
         return parent1, parent2
     
     def crossover(self, parent1: network.NeuralNetwork, parent2: network.NeuralNetwork) -> network.NeuralNetwork:
-        """Perform crossover between two parent networks"""
         if random.random() > self.crossover_rate:
             return copy.deepcopy(parent1)
         
@@ -104,7 +92,6 @@ class GeneticAlgorithm:
         return child
     
     def mutate(self, individual: network.NeuralNetwork):
-        """Apply mutations to an individual"""
         if random.random() > self.mutation_rate:
             return
         
@@ -121,18 +108,13 @@ class GeneticAlgorithm:
         individual.load_weights(weights)
     
     def evolve(self, game_results: List[Tuple[int, int]]) -> List[network.NeuralNetwork]:
-        """Evolve the population based on game results"""
         self.generation += 1
         
-        print(f"Game results: {game_results}")
-        
-        # Calculate fitness for each individual
         fitness_scores = []
         for i, individual in enumerate(self.population):
             fitness = self.evaluate_fitness(individual, game_results)
             fitness_scores.append(fitness)
         
-        # Find best individual
         best_idx = fitness_scores.index(max(fitness_scores))
         best_fitness = fitness_scores[best_idx]
         
@@ -143,7 +125,6 @@ class GeneticAlgorithm:
         
         print(f"Generation {self.generation} - Best: {best_fitness}, Avg: {np.mean(fitness_scores):.1f}")
         
-        # Create new population
         new_population = []
         
         # Elitism: keep the best individual
@@ -160,13 +141,11 @@ class GeneticAlgorithm:
         return self.population
     
     def get_best_individual(self) -> network.NeuralNetwork:
-        """Get the best individual found so far"""
         if self.best_individual is None:
             raise ValueError("No best individual found")
         return self.best_individual
     
     def save_best_individual(self, filename: str = "best_genetic_dino.npz"):
-        """Save the best individual's weights"""
         if self.best_individual is None:
             print(" No best individual to save")
             return False
