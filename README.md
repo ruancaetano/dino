@@ -1,16 +1,15 @@
 # 🦖 Dino Game
 
-A Python-based dino running game inspired by Chrome's offline game, developed to practice Python programming skills and explore machine learning concepts.
+A Python-based dinosaur running game inspired by Chrome's offline T-Rex game, developed to practice Python programming skills and explore machine learning concepts.
 
 ![Game Screenshot](.github/assets/game.png)
 
-## 🎮 Features
-
-- **Multi-Dino Support**: Control multiple dinosaurs simultaneously
-- **Dynamic Scoring System**: Real-time score tracking with top 5 leaderboard
-- **Progressive Difficulty**: Game speed increases as you progress
-
 ## 🚀 Installation
+
+### Prerequisites
+
+- Python 3.7 or higher
+- Pygame library
 
 ### Setup
 
@@ -27,11 +26,34 @@ cd dino
 pip install -r requirements.txt
 ```
 
-3. Run the game:
+## 🎮 Run Methods
+
+### Play Mode
 
 ```bash
-python main.py
+python main.py play
 ```
+
+- Single dinosaur with keyboard controls
+- Use Space/Up/Down arrows to control
+
+### Training Mode
+
+```bash
+python main.py train
+```
+
+- Multiple dinosaurs with random AI behavior
+- Collects training data for machine learning
+
+### Auto Mode
+
+```bash
+python main.py auto
+```
+
+- Multiple dinosaurs with trained AI model
+- Uses the last trained model for intelligent gameplay
 
 ## 🎯 How to Play
 
@@ -40,8 +62,8 @@ python main.py
 - **Space/Up Arrow**: Jump
 - **Down Arrow**: Duck (when falling)
 
-### Scoring
+### Objective
 
-- Earn 1 point for each obstacle successfully avoided
-- Game speed increases every 30 points
+- Avoid obstacles (trees) by jumping over them
+- Survive as long as possible to achieve high scores
 - Top 5 scores are displayed in real-time

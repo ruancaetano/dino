@@ -16,12 +16,13 @@ from dino import DINO_WIDTH, DINO_HEIGHT
 
 
 class Game:
-    def __init__(self, dinos_quantities: int):
+    def __init__(self, dinos_quantities: int, controller_type: str = 'keyboard'):
         pygame.init()
 
         self.clock = pygame.time.Clock()
         self.clock_tick = configs.CLOCK_TICK
         self.dinos_quantities = dinos_quantities
+        self.controller_type = controller_type
         self.event_manager = None
         self.dino_sprites = []
         self.game_state = None
@@ -39,7 +40,15 @@ class Game:
         self.game_state.floor_rect = self.floor_sprite.rect
 
         for index in range(self.dinos_quantities):
-            dino_controller = controller.KeyboardController()
+            # Create controller based on type
+            if self.controller_type == 'keyboard':
+                dino_controller = controller.KeyboardController()
+            elif self.controller_type == 'random':
+                dino_controller = controller.RandomController()
+            elif self.controller_type == 'trained':
+                dino_controller = controller.TrainedController()
+            else:
+                dino_controller = controller.KeyboardController()  # Default fallback
 
             dino_id = index + 1
             dino_sprite = dino.Dino(dino_id, self.game_state, dino_controller)
