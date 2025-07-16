@@ -40,6 +40,8 @@ class Game:
         self.game_state.floor_rect = self.floor_sprite.rect
 
         for index in range(self.dinos_quantities):
+            dino_id = index + 1
+            
             # Create controller based on type
             if self.controller_type == 'keyboard':
                 dino_controller = controller.KeyboardController()
@@ -47,10 +49,11 @@ class Game:
                 dino_controller = controller.RandomController()
             elif self.controller_type == 'trained':
                 dino_controller = controller.TrainedController()
+            elif self.controller_type == 'train':
+                dino_controller = controller.NeuralNetworkController(dino_id, self.game_state)
             else:
                 dino_controller = controller.KeyboardController()  # Default fallback
 
-            dino_id = index + 1
             dino_sprite = dino.Dino(dino_id, self.game_state, dino_controller)
             self.dino_sprites.append(dino_sprite)
             self.game_state.all_sprites_group.add(dino_sprite)
